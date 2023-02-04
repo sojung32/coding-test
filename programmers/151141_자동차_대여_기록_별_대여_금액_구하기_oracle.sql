@@ -1,0 +1,29 @@
+SELECT
+    *
+FROM (
+    SELECT
+        HIS.HISTORY_ID
+        , (END_DATE - START_DATE + 1) * CAR.DAILY_FEE * (100 - NVL(PLAN.DISCOUNT_RATE, 0)) / 100 FEE
+    FROM 
+        CAR_RENTAL_COMPANY_RENTAL_HISTORY HIS
+    LEFT OUTER JOIN 
+        CAR_RENTAL_COMPANY_CAR CAR
+        ON HIS.CAR_ID = CAR.CAR_ID
+    LEFT OUTER JOIN
+        (
+            SELECT
+                PLAN_ID
+                , REGEXP_REPLACE(DURATION_TYPE, '[^0-9]', '') MIN_DURATION
+                , LEAD(REGEXP_REPLACE(DURATION_TYPE, '[^0-9]', ''), 1, 99999) OVER(ORDER BY TO_NUMBER(REGEXP_REPLACE(DURATION_TYPE, '[^0-9]', ''))) - 1 MAX_DURATION
+                , DISCOUNT_RATE
+            FROM 
+                CAR_RENTAL_COMPANY_DISCOUNT_PLAN 
+            WHERE
+                CAR_TYPE = '트럭'
+        ) PLAN
+        ON (END_DATE - START_DATE + 1) BETWEEN MIN_DURATION AND MAX_DURATION
+    WHERE
+        CAR.CAR_TYPE = '트럭'
+)
+ORDER BY
+    FEE DESC, HISTORY_ID DESC
