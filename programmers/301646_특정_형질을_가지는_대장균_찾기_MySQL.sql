@@ -1,0 +1,10 @@
+SELECT
+    COUNT(1) COUNT
+FROM
+    ECOLI_DATA
+WHERE
+    SUBSTR(BIN(GENOTYPE), -2, 1) != '1'
+    AND (
+        SUBSTR(BIN(GENOTYPE), -1, 1) = '1'
+        OR SUBSTR(BIN(GENOTYPE), -3, 1) = '1'
+    )

@@ -1,0 +1,18 @@
+SELECT
+    DISTINCT ID
+    , EMAIL
+    , FIRST_NAME
+    , LAST_NAME
+FROM
+    DEVELOPERS DEV
+INNER JOIN (
+        SELECT
+            CHAR_LENGTH(BIN(CODE)) BIN_CODE
+        FROM
+            SKILLCODES
+        WHERE
+            CATEGORY = 'Front End'
+    ) SK
+    ON SUBSTR(BIN(DEV.SKILL_CODE), SK.BIN_CODE * -1, 1) = 1
+ORDER BY
+    ID ASC
