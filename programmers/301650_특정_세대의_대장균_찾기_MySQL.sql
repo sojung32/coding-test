@@ -1,0 +1,27 @@
+WITH RECURSIVE ECOLI AS (
+    SELECT
+        ID
+        , PARENT_ID
+        , 1 AS LVL
+    FROM
+        ECOLI_DATA ED
+    WHERE
+        PARENT_ID IS NULL
+    UNION ALL
+    SELECT
+        EDC.ID
+        , EDC.PARENT_ID
+        , ED.LVL + 1 AS LVL
+    FROM
+        ECOLI_DATA EDC
+    JOIN ECOLI ED
+    ON EDC.PARENT_ID = ED.ID
+)
+SELECT
+    ID
+FROM
+    ECOLI
+WHERE
+    LVL = 3
+ORDER BY
+    ID ASC

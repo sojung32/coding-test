@@ -1,0 +1,37 @@
+WITH RECURSIVE ECOLI AS (
+    SELECT
+        ID
+        , PARENT_ID
+        , 1 AS LVL
+    FROM
+        ECOLI_DATA ED
+    WHERE
+        PARENT_ID IS NULL
+    UNION ALL
+    SELECT
+        EDC.ID
+        , EDC.PARENT_ID
+        , ED.LVL + 1 AS LVL
+    FROM
+        ECOLI_DATA EDC
+    JOIN ECOLI ED
+    ON EDC.PARENT_ID = ED.ID
+)
+SELECT
+    COUNT(1) COUNT
+    , LVL GENERATION
+FROM
+    ECOLI EC
+LEFT OUTER JOIN (
+    SELECT 
+        PARENT_ID
+        , COUNT(1) CHILD_COUNT
+    FROM ECOLI_DATA 
+    GROUP BY 
+        PARENT_ID
+) ECD 
+ON ECD.PARENT_ID = EC.ID
+WHERE 
+    ECD.PARENT_ID IS NULL
+GROUP BY 
+    LVL
